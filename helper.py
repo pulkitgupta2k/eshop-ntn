@@ -97,7 +97,8 @@ def get_product_inf(cat, link):
                         units.append("")
                 else:
                     brand = table_row[1].text
-        except:
+        except Exception as e:
+            print(e)
             pass
 
 
@@ -107,6 +108,7 @@ def get_product_inf(cat, link):
     for index, visual in enumerate(visuals):
         visual = visual['href']
         name = "{}-{}-{}.jpg".format(item_code.strip(), brand.strip(), index+1)
+        names.append(name)
         download_img(visual, name)
     try:
         pdf_link = soup.find("a", {"title": "Technical data"})['href']
@@ -128,6 +130,7 @@ def get_product_inf(cat, link):
         row.append(value[index])
         row.append(units[index])
         row.append(brand)
+        row.append(section[index])
         row.extend(names)
         row.append(cad)
         row.append(pdf_link)
@@ -135,18 +138,22 @@ def get_product_inf(cat, link):
         row.append(link)
         row.extend(cats)
         result.append(row)
-        print(row)
     return result
 
 def make_sheet():
     with open("product_links.json", "r") as f:
         products = json.load(f)
-    heading = []
-
+    heading = [["Item_Code","Criteria",	"Value","Units","Brand","Section","Product Image","Product Diagram","Product Diagram 1","CAD Link","PDF Link","PDF File","Direct Web Link",	"Category 1","Category 2","Category 3","Category 4","Category 5","Category 6"]]
+    tabulate("results.csv", heading)
     for cat, links in products.items():
         for link in links:
-            result = get_product_inf(cat, link)
-            tabulate("results.csv",result)
+            try:
+                print(link)
+                result = get_product_inf(cat, link)
+                tabulate("results.csv",result)
+            except Exception as e:
+                print(e)
+                pass
 
 def get_category_driver():
     link = "https://eshop.ntn-snr.com/en/Industry-Solutions-12078.html"
