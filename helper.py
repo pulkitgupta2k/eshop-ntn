@@ -122,13 +122,13 @@ def get_product_inf(cat, links):
                 table_rows = table.findAll("tr")
                 for table_row in table_rows:
                     table_row = table_row.findAll("td")
-                    if i==0:
-                        section.append("Product Definition")
-                    if i==1:
-                        section.append("Product Performance")
-                    if i==2:
-                        section.append("Product Dimensions")
                     if not table_row[0].text == "Brand":
+                        if i==0:
+                            section.append("Product Definition")
+                        if i==1:
+                            section.append("Product Performance")
+                        if i==2:
+                            section.append("Abutment Dimensions")
                         criteria.append(table_row[0].text)
                         ans = table_row[1].text.split()
                         value.append(ans[0])
@@ -160,6 +160,7 @@ def get_product_inf(cat, links):
             pdf_link = ""
         try:
             pdf_name = "{}-{}-{}.pdf".format(item_code.strip(), brand.strip(), "Datasheet")
+            pdf_name = pdf_name.replace("/", "-")
             to_downlaod_pdfs_link.append(pdf_link)
             to_downlaod_pdfs_name.append(pdf_name)
             # download_pdf(pdf_link, pdf_name)
