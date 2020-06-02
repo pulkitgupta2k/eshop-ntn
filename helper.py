@@ -180,5 +180,5 @@ def driver():
     # get_category_driver()
     # get_product_links("https://eshop.ntn-snr.com/en/Single-row-deep-groove-ball-bearings-2246325.html")
     # get_links_driver()
-    get_product_inf("Home e-Shop:Industry Solutions:Ball bearings:Radial ball bearings:Single row deep groove ball bearings","https://eshop.ntn-snr.com/en/16003-16C3-689756.html")
-    # make_sheet()
+    # get_product_inf("Home e-Shop:Industry Solutions:Ball bearings:Radial ball bearings:Single row deep groove ball bearings","https://eshop.ntn-snr.com/en/16003-16C3-689756.html")
+    make_sheet()
