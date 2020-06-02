@@ -62,7 +62,7 @@ def download_pdf(urls, names):
         open("pdfs/{}".format(names[index]), "wb").write(req.content)
 
 def tabulate(csvfile, matrix):
-    with open(csvfile, "a", newline='') as f:
+    with open(csvfile, "a", newline='', encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerows(matrix)
 
