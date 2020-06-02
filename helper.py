@@ -95,15 +95,25 @@ def get_product_links(link):
         categories.append(header)
     key = ":".join(categories)
     print(key)
+    total_prods = int(soup.find("span", {"class": "result-amount"}).text.replace("(", "").split()[0])
+    print(total_prods)
+    if total_prods>2500:
+        key=key+":NOT_COMPLETE"
+    
+    page_links = []
     for i in range(1, int(last_page)+1):
         page_link = "{}?catalogParam%5Bpage%5D={}".format(link, i)
-        page_soup = getSoup(page_link)
+        page_links.append(page_link
+        )
+    page_soups = getSoup_list(page_links)
+    
+    for page_soup in page_soups:
         page_product_links = page_soup.findAll("a", {"class": "is-product-short-label"})
         for page_product_link in page_product_links:
             page_product_link = page_product_link['href']
-            print(page_product_link)
             product_links.append(page_product_link)
     result[key] = product_links
+
     return result
 
 def get_product_inf(cat, links):
