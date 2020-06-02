@@ -7,13 +7,15 @@ import time
 import grequests
 
 def getSoup_list(urls):
-    MAX_CONNECTIONS = 200
+    MAX_CONNECTIONS = 100
     requests = []
     for x in range(0,len(urls),MAX_CONNECTIONS):
         rs = (grequests.get(u, stream=False) for u in urls[x:x+MAX_CONNECTIONS])
         print(".")
         time.sleep(0.2)
-        requests.extend(grequests.map(rs))
+        response = grequests.map(rs)
+        requests.extend(response)
+        print(response)
     soups = []
     for request in requests:
         html = request.content
@@ -43,7 +45,10 @@ def download_img(urls, names):
         time.sleep(0.2)
         requests.extend(grequests.map(rs))
     for index, req in enumerate(requests):
-        open("images/{}".format(names[index]), "wb").write(req.content)
+        try:
+            open("images/{}".format(names[index]), "wb").write(req.content)
+        except Exception as e:
+            print(e)
 
 def download_pdf(urls, names):
     MAX_CONNECTIONS = 100
@@ -198,7 +203,7 @@ def make_sheet():
     with open("product_links.json", "r") as f:
         products = json.load(f)
     heading = [["Item_Code","Criteria",	"Value","Units","Brand","Section","Product Image","Product Diagram","Product Diagram 1","CAD Link","PDF Link","PDF File","Direct Web Link",	"Category 1","Category 2","Category 3","Category 4","Category 5","Category 6"]]
-    tabulate("results.csv", heading)
+    # tabulate("results.csv", heading)
     for cat, links in products.items():
         try:
             print(cat)
