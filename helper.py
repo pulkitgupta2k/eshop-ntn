@@ -3,7 +3,6 @@ import json
 from pprint import pprint
 from datetime import datetime
 import csv
-from multithread import getSoup_list
 import time
 import grequests
 
