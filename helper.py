@@ -186,7 +186,15 @@ def get_product_inf(cat, links):
                 row.append(units[index])
                 row.append(brand)
                 row.append(section[index])
-                row.extend(names)
+                row.append(names[0])
+                try:
+                    row.append(names[1])
+                except:
+                    row.append("")
+                try:
+                    row.append(names[2])
+                except:
+                    row.append("")
                 row.append(cad)
                 row.append(pdf_link)
                 row.append(pdf_name)
