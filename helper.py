@@ -109,7 +109,6 @@ def get_product_inf(cat, link):
         visual = visual['href']
         name = "{}-{}-{}.jpg".format(item_code.strip(), brand.strip(), index+1)
         name = name.replace("/", "-")
-        print(name)
         names.append(name)
         download_img(visual, name)
     try:
