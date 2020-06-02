@@ -7,7 +7,7 @@ import time
 import grequests
 
 def getSoup_list(urls):
-    MAX_CONNECTIONS = 100
+    MAX_CONNECTIONS = 200
     requests = []
     for x in range(0,len(urls),MAX_CONNECTIONS):
         rs = (grequests.get(u, stream=False) for u in urls[x:x+MAX_CONNECTIONS])
@@ -39,6 +39,7 @@ def download_img(urls, names):
     requests = []
     for x in range(0,len(urls),MAX_CONNECTIONS):
         rs = (grequests.get(u, stream=False) for u in urls[x:x+MAX_CONNECTIONS])
+        print("..")
         time.sleep(0.2)
         requests.extend(grequests.map(rs))
     for index, req in enumerate(requests):
@@ -49,6 +50,7 @@ def download_pdf(urls, names):
     requests = []
     for x in range(0,len(urls),MAX_CONNECTIONS):
         rs = (grequests.get(u, stream=False) for u in urls[x:x+MAX_CONNECTIONS])
+        print("...")
         time.sleep(0.2)
         requests.extend(grequests.map(rs))
     for index, req in enumerate(requests):
@@ -108,85 +110,88 @@ def get_product_inf(cat, links):
     to_downlaod_pdfs_name = []
     for index_link, soup in enumerate(soups):
         print(links[index_link])
-        item_code = soup.find("span", {"itemprop":"name"}).text.strip()
-        cats = cat.split(":")
-        criteria = []
-        value = []
-        units = []
-        brand = ""
-        names = []
-        section = []
-        for i in range(0, 3):
+        try:
+            item_code = soup.find("span", {"itemprop":"name"}).text.strip()
+            cats = cat.split(":")
+            criteria = []
+            value = []
+            units = []
+            brand = ""
+            names = []
+            section = []
+            for i in range(0, 3):
+                try:
+                    table = soup.findAll("table",{"class":"product-features-table"})[i]
+                    table_rows = table.findAll("tr")
+                    for table_row in table_rows:
+                        table_row = table_row.findAll("td")
+                        if not table_row[0].text == "Brand":
+                            if i==0:
+                                section.append("Product Definition")
+                            if i==1:
+                                section.append("Product Performance")
+                            if i==2:
+                                section.append("Abutment Dimensions")
+                            criteria.append(table_row[0].text)
+                            ans = table_row[1].text.split()
+                            value.append(ans[0])
+                            try:
+                                units.append(ans[1])
+                            except:
+                                units.append("")
+                        else:
+                            brand = table_row[1].text
+                except Exception as e:
+                    print(e)
+                    pass
+
+
+
+            
+            visuals = soup.find("div", {"class": "accordion-content"}).findAll("a")
+            for index, visual in enumerate(visuals):
+                visual = visual['href']
+                name = "{}-{}-{}.jpg".format(item_code.strip(), brand.strip(), index+1)
+                name = name.replace("/", "-")
+                names.append(name)
+                to_downlaod_imgs_name.append(name)
+                to_downlaod_imgs_link.append(visual)
+                # download_img(visual, name)
             try:
-                table = soup.findAll("table",{"class":"product-features-table"})[i]
-                table_rows = table.findAll("tr")
-                for table_row in table_rows:
-                    table_row = table_row.findAll("td")
-                    if not table_row[0].text == "Brand":
-                        if i==0:
-                            section.append("Product Definition")
-                        if i==1:
-                            section.append("Product Performance")
-                        if i==2:
-                            section.append("Abutment Dimensions")
-                        criteria.append(table_row[0].text)
-                        ans = table_row[1].text.split()
-                        value.append(ans[0])
-                        try:
-                            units.append(ans[1])
-                        except:
-                            units.append("")
-                    else:
-                        brand = table_row[1].text
-            except Exception as e:
-                print(e)
-                pass
-
-
-
-        
-        visuals = soup.find("div", {"class": "accordion-content"}).findAll("a")
-        for index, visual in enumerate(visuals):
-            visual = visual['href']
-            name = "{}-{}-{}.jpg".format(item_code.strip(), brand.strip(), index+1)
-            name = name.replace("/", "-")
-            names.append(name)
-            to_downlaod_imgs_name.append(name)
-            to_downlaod_imgs_link.append(visual)
-            # download_img(visual, name)
-        try:
-            pdf_link = soup.find("a", {"title": "Technical data"})['href']
-        except:
-            pdf_link = ""
-        try:
-            pdf_name = "{}-{}-{}.pdf".format(item_code.strip(), brand.strip(), "Datasheet")
-            pdf_name = pdf_name.replace("/", "-")
-            to_downlaod_pdfs_link.append(pdf_link)
-            to_downlaod_pdfs_name.append(pdf_name)
-            # download_pdf(pdf_link, pdf_name)
-        except:
-            pdf_name = ""
-        try:
-            cad = soup.find("a", {"title": "View CAD drawing"})['href']
-        except:
-            cad = ""
-        for index, c in enumerate(criteria):
-            row = []
-            row.append(item_code)
-            row.append(c)
-            row.append(value[index])
-            row.append(units[index])
-            row.append(brand)
-            row.append(section[index])
-            row.extend(names)
-            row.append(cad)
-            row.append(pdf_link)
-            row.append(pdf_name)
-            row.append(links[index_link])
-            row.extend(cats)
-            result.append(row)
+                pdf_link = soup.find("a", {"title": "Technical data"})['href']
+            except:
+                pdf_link = ""
+            try:
+                pdf_name = "{}-{}-{}.pdf".format(item_code.strip(), brand.strip(), "Datasheet")
+                pdf_name = pdf_name.replace("/", "-")
+                to_downlaod_pdfs_link.append(pdf_link)
+                to_downlaod_pdfs_name.append(pdf_name)
+                # download_pdf(pdf_link, pdf_name)
+            except:
+                pdf_name = ""
+            try:
+                cad = soup.find("a", {"title": "View CAD drawing"})['href']
+            except:
+                cad = ""
+            for index, c in enumerate(criteria):
+                row = []
+                row.append(item_code)
+                row.append(c)
+                row.append(value[index])
+                row.append(units[index])
+                row.append(brand)
+                row.append(section[index])
+                row.extend(names)
+                row.append(cad)
+                row.append(pdf_link)
+                row.append(pdf_name)
+                row.append(links[index_link])
+                row.extend(cats)
+                result.append(row)
+        except Exception as e:
+            print(e)
     download_img(to_downlaod_imgs_link, to_downlaod_imgs_name)
-    download_pdf(to_downlaod_pdfs_link, to_downlaod_pdfs_name)
+    # download_pdf(to_downlaod_pdfs_link, to_downlaod_pdfs_name)
     return result
 
 def make_sheet():
