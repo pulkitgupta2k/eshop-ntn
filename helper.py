@@ -117,7 +117,7 @@ def get_product_inf(cat, link):
         pdf_link = ""
     try:
         pdf_name = "{}-{}-{}.pdf".format(item_code.strip(), brand.strip(), "Datasheet")
-        download_pdf(pdf_link, name)
+        download_pdf(pdf_link, pdf_name)
     except:
         pdf_name = ""
     try:
