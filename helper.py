@@ -54,7 +54,7 @@ def get_product_links(link):
     key = ":".join(categories)
     print(key)
     for i in range(1, int(last_page)+1):
-        page_link = "https://eshop.ntn-snr.com/en/Single-row-deep-groove-ball-bearings-2246325.html?catalogParam%5Bpage%5D={}".format(i)
+        page_link = "{}?catalogParam%5Bpage%5D={}".format(link, i)
         page_soup = getSoup(page_link)
         page_product_links = page_soup.findAll("a", {"class": "is-product-short-label"})
         for page_product_link in page_product_links:
@@ -179,6 +179,6 @@ def get_links_driver():
 def driver():
     # get_category_driver()
     # get_product_links("https://eshop.ntn-snr.com/en/Single-row-deep-groove-ball-bearings-2246325.html")
-    # get_links_driver()
+    get_links_driver()
     # get_product_inf("Home e-Shop:Industry Solutions:Ball bearings:Radial ball bearings:Single row deep groove ball bearings","https://eshop.ntn-snr.com/en/16003-16C3-689756.html")
     make_sheet()
