@@ -11,6 +11,7 @@ def getSoup_list(urls):
     requests = []
     for x in range(0,len(urls),MAX_CONNECTIONS):
         rs = (grequests.get(u, stream=False) for u in urls[x:x+MAX_CONNECTIONS])
+        print(".")
         time.sleep(0.2)
         requests.extend(grequests.map(rs))
     soups = []
@@ -33,27 +34,25 @@ def getSoup(link):
     soup = BeautifulSoup(html, "html.parser")
     return soup
 
-def download_img(visual, name):
-    urls = [visual]
+def download_img(urls, names):
     MAX_CONNECTIONS = 100
     requests = []
     for x in range(0,len(urls),MAX_CONNECTIONS):
         rs = (grequests.get(u, stream=False) for u in urls[x:x+MAX_CONNECTIONS])
         time.sleep(0.2)
         requests.extend(grequests.map(rs))
-    req = requests[0]
-    open("images/{}".format(name), "wb").write(req.content)
+    for index, req in enumerate(requests):
+        open("images/{}".format(names[index]), "wb").write(req.content)
 
-def download_pdf(pdf_link, name):
-    urls = [pdf_link]
+def download_pdf(urls, names):
     MAX_CONNECTIONS = 100
     requests = []
     for x in range(0,len(urls),MAX_CONNECTIONS):
         rs = (grequests.get(u, stream=False) for u in urls[x:x+MAX_CONNECTIONS])
         time.sleep(0.2)
         requests.extend(grequests.map(rs))
-    req = requests[0]
-    open("pdfs/{}".format(name), "wb").write(req.content)
+    for index, req in enumerate(requests):
+        open("pdfs/{}".format(names[index]), "wb").write(req.content)
 
 def tabulate(csvfile, matrix):
     with open(csvfile, "a", newline='') as f:
@@ -103,7 +102,12 @@ def get_product_links(link):
 def get_product_inf(cat, links):
     result = []
     soups = getSoup_list(links)
+    to_downlaod_imgs_name = []
+    to_downlaod_imgs_link = []
+    to_downlaod_pdfs_link = []
+    to_downlaod_pdfs_name = []
     for index_link, soup in enumerate(soups):
+        print(links[index_link])
         item_code = soup.find("span", {"itemprop":"name"}).text.strip()
         cats = cat.split(":")
         criteria = []
@@ -147,14 +151,18 @@ def get_product_inf(cat, links):
             name = "{}-{}-{}.jpg".format(item_code.strip(), brand.strip(), index+1)
             name = name.replace("/", "-")
             names.append(name)
-            download_img(visual, name)
+            to_downlaod_imgs_name.append(name)
+            to_downlaod_imgs_link.append(visual)
+            # download_img(visual, name)
         try:
             pdf_link = soup.find("a", {"title": "Technical data"})['href']
         except:
             pdf_link = ""
         try:
             pdf_name = "{}-{}-{}.pdf".format(item_code.strip(), brand.strip(), "Datasheet")
-            download_pdf(pdf_link, pdf_name)
+            to_downlaod_pdfs_link.append(pdf_link)
+            to_downlaod_pdfs_name.append(pdf_name)
+            # download_pdf(pdf_link, pdf_name)
         except:
             pdf_name = ""
         try:
@@ -176,6 +184,8 @@ def get_product_inf(cat, links):
             row.append(links[index_link])
             row.extend(cats)
             result.append(row)
+    download_img(to_downlaod_imgs_link, to_downlaod_imgs_name)
+    download_pdf(to_downlaod_pdfs_link, to_downlaod_pdfs_name)
     return result
 
 def make_sheet():
