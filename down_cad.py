@@ -20,12 +20,19 @@ def download_file(sel, name, link):
     sel.get(link)
     selection = sel.find_element_by_xpath("//select[@id='cad-format-select']")
     for option in selection.find_elements_by_tag_name('option'):
-        if option.text == '3D XML':
+        if option.text == 'AutoCAD (DWG) - 2D':
             option.click()
     time.sleep(2)
     sel.find_element_by_xpath("//button[@id='direct-download']").click()
+
     while(len(os.listdir(temp_loc)) == 0):
-        pass
+        try:
+            download_notification = sel.find_element_by_xpath("//div[@class='lobibox-notify lobibox-notify-success color-background-5 color-font-3 color-border-1 animated-fast zoomInDown without-icon']")
+            if download_notification:
+                download_notification.click()
+        except:
+            pass
+    time.sleep(2)
     while(os.listdir(temp_loc)[0].split('.')[-1] != 'zip'):
         pass
     print(os.listdir(temp_loc)[0])
